@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 import uvicorn
 from predict import predict_face_shape  # Ensure this is defined in predict.py
@@ -38,7 +38,7 @@ async def predict_shape(file: UploadFile = File(...)):
 
 # Overlay route
 @app.post("/overlay")
-async def overlay_glasses_on_image(file: UploadFile = File(...), glass_type: str = "style1"):
+async def overlay_glasses_on_image(file: UploadFile = File(...), glass_type: str = Form("style1")):
     
        # Read the uploaded image directly into memory
     image_bytes = await file.read()
