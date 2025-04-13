@@ -5,10 +5,9 @@ from feature_engineer_mp import extract_geometric_features_from_mp
 
 mp_face_mesh = mp.solutions.face_mesh
 
-def predict_face_shape(image_path, return_landmarks=False):
-    image = cv2.imread(image_path)
+def predict_face_shape(image, return_landmarks=False):
     if image is None:
-        raise ValueError("Could not load image at " + image_path)
+        raise ValueError("Could not load image at")
 
     with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refine_landmarks=True) as face_mesh:
         results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))

@@ -20,13 +20,14 @@ def read_root():
 @app.post("/predict")
 async def predict_shape(file: UploadFile = File(...)):
     # Save the uploaded image temporarily
-    image = await file.read()
-    image_path = "temp_image.jpg"
-    with open(image_path, "wb") as f:
-        f.write(image)
-
+    image_bytes = await file.read()
+    
+    # Convert bytes to numpy array
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    
     # Get face shape prediction
-    face_shape = predict_face_shape(image_path)
+    face_shape = predict_face_shape(image)
     glasses_options = recommend_glasses(face_shape)
     
     return JSONResponse(content={
