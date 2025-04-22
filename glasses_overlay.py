@@ -40,9 +40,6 @@ def overlay_glasses(image, landmarks, glasses_img_path):
 
     return image
 
-
+#oh well
 def getNumGlasses(glassesType):
-    if glassesType == "square":
-        return 3
-    else:
-        return 2
+    return 3
