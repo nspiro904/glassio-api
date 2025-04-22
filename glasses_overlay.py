@@ -39,3 +39,10 @@ def overlay_glasses(image, landmarks, glasses_img_path):
                 image[y + i, x + j] = (1 - alpha) * image[y + i, x + j] + alpha * rotated[i, j, :3]
 
     return image
+
+
+def getNumGlasses(glassesType):
+    if glassesType == "square":
+        return 3
+    else:
+        return 2

@@ -3,10 +3,11 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from predict import predict_face_shape  # Ensure this is defined in predict.py
 from glasses_recommend import recommend_glasses  # Ensure this is defined in glasses_recommend.py
-from glasses_overlay import overlay_glasses  # Ensure this is defined in glasses_overlay.py
+from glasses_overlay import overlay_glasses, getNumGlasses  # Ensure this is defined in glasses_overlay.py
 import numpy as np
 import cv2
 import base64
+import copy
 
 # Create the FastAPI app instance
 app = FastAPI()
@@ -49,18 +50,26 @@ async def overlay_glasses_on_image(file: UploadFile = File(...), glass_type: str
     
     # Get face shape prediction and landmarks (using image directly)
     landmarks = predict_face_shape(image, return_landmarks=True)
-    glasses_image = f"glasses/{glass_type}.png"  # Choose the style based on glass_type
+      # Choose the style based on glass_type
     
     # Apply glasses overlay
-    result_image = overlay_glasses(image, landmarks, glasses_image)
+
+    overlayed_images = []
+
+    for i in range(getNumGlasses(glass_type)):
+        glasses_image = f"glasses/{glass_type}/{i + 1}.png"
+
+        imageCopy = image.copy()
+        result_image = overlay_glasses(imageCopy, landmarks, glasses_image)
+        _, encoded_image = cv2.imencode('.png', result_image)
+        base64_image = base64.b64encode(encoded_image).decode('utf-8')
+
+        overlayed_images.append(f"data:image/png;base64,{base64_image}")
     
-    # Encode the result image to base64
-    _, encoded_image = cv2.imencode('.png', result_image)
-    base64_image = base64.b64encode(encoded_image).decode('utf-8')
-    
+
     return JSONResponse(content={
         "message": "Glasses overlay applied successfully",
-        "result_image": f"data:image/png;base64,{base64_image}"
+        "result_images": overlayed_images
     })
 
 if __name__ == "__main__":
@@ -90,3 +99,4 @@ if __name__ == "__main__":
         # "result_image": result_image_path
     # })
 # 
+
